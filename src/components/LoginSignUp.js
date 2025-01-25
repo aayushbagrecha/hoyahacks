@@ -7,6 +7,8 @@ const LoginSignUp = () => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('doctor'); // default role set to 'doctor'
 
+  const baseUrl = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -16,7 +18,7 @@ const LoginSignUp = () => {
       : { username: email, email, role, password };
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+      const response = await fetch(`${baseUrl+endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
