@@ -16,3 +16,7 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
+    
+# Access the database and the users collection
+db = client["hoyahax"]  # Replace with your database name
+user_collection = db["users"]  # Replace with your collection names

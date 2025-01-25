@@ -7,10 +7,41 @@ const LoginSignUp = () => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('doctor'); // default role set to 'doctor'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login or signup logic here
-    console.log(isLogin ? 'Login' : 'SignUp', { email, password, name, role });
+
+    const endpoint = isLogin ? '/auth/login' : '/auth/signup';
+    const payload = isLogin
+      ? { username: email, password }
+      : { username: email, email, role, password };
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.detail || 'Something went wrong!');
+        return;
+      }
+
+      const data = await response.json();
+
+      if (isLogin) {
+        // Save the token in localStorage for later use
+        localStorage.setItem('token', data.access_token);
+        alert('Login successful!');
+      } else {
+        alert('Signup successful! Please login.');
+        setIsLogin(true);
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+      console.error(error);
+    }
   };
 
   return (

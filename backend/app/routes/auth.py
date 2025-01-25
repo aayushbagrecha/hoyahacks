@@ -19,7 +19,7 @@ async def signup(user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
     hashed_password = hash_password(user.password)
-    user_data = {"username": user.username, "email": user.email, "password": hashed_password}
+    user_data = {"username": user.username, "email": user.email, "role": user.role, "password": hashed_password, "role": user.role}
     create_user(user_data)
     return {"message": "User created successfully"}
 
