@@ -38,6 +38,9 @@ const LoginSignUp = () => {
       if (isLogin) {
         // Save the token locally (for further use if needed)
         localStorage.setItem('token', data.access_token);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('user_id', data.user_id);
+        console.log(data);
         setMessage({ type: 'success', text: `Login successful! Welcome, ${data.role || 'user'}!` });
 
         if (data.role === "patient") {

@@ -1,13 +1,40 @@
 import React from "react";
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
 import { FileInput, Label } from "flowbite-react";
 
 const UploadAudio = ({ handleClose, isOpen }) => {
     const [open, setOpen] = useState(isOpen);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState("");
+    const [userId, setUserId] = useState("");
 
     const baseUrl = process.env.REACT_APP_API_URL;
+
+    useEffect(() => {
+        // Fetch user_id from localStorage
+        const storedUserId = localStorage.getItem("user_id");
+        if (storedUserId) {
+            setUserId(storedUserId);
+        }
+
+        const fetchDoctors = async () => {
+            try {
+                const response = await fetch(`${baseUrl}/users/doctors`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setDoctors(data);
+                } else {
+                    console.error("Failed to fetch doctors");
+                }
+            } catch (error) {
+                console.error("Error fetching doctors:", error);
+            }
+        };
+
+        fetchDoctors();
+    }, []);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -18,13 +45,15 @@ const UploadAudio = ({ handleClose, isOpen }) => {
     };
 
     const handleSave = async () => {
-        if (!selectedFile) {
-            alert("No file selected!");
+        if (!selectedFile || !userId || !selectedDoctor) {
+            alert("Ensure all required fields are selected!");
             return;
         }
 
-        // Send the file to the backend
+        // Prepare the form data
         const formData = new FormData();
+        formData.append("user_id", userId); // Add user_id
+        formData.append("doc_id", selectedDoctor); // Add doc_id
         formData.append("file", selectedFile);
 
         try {
@@ -33,6 +62,9 @@ const UploadAudio = ({ handleClose, isOpen }) => {
                 body: formData,
             });
 
+            console.log("user_id:", userId);
+            console.log("doc_id:", selectedDoctor);
+            
             if (response.ok) {
                 const data = await response.json();
                 console.log("File uploaded:", data.file_path);
@@ -63,6 +95,24 @@ const UploadAudio = ({ handleClose, isOpen }) => {
                         className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
                     >
                         <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div className="mb-4">
+                                <Label htmlFor="doctor-select" value="Select Doctor" />
+                                <select
+                                    id="doctor-select"
+                                    className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+                                    value={selectedDoctor}
+                                    onChange={(e) => setSelectedDoctor(e.target.value)}
+                                >
+                                    <option value="" disabled>
+                                        Select a doctor
+                                    </option>
+                                    {doctors.map((doctor) => (
+                                        <option key={doctor._id} value={doctor._id}>
+                                            {doctor.username}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <div>
                                 <Label htmlFor="file-upload-helper-text" value="Upload file" />
                             </div>
@@ -73,6 +123,7 @@ const UploadAudio = ({ handleClose, isOpen }) => {
                                 type="button"
                                 onClick={handleSave}
                                 className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
+                                disabled={!selectedFile || !selectedDoctor || !userId} // Disable until all fields are selected
                             >
                                 Save
                             </button>

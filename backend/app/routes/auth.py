@@ -29,4 +29,4 @@ async def login(user: UserLogin):
     if not db_user or not verify_password(user.password, db_user["password"]):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     access_token = create_access_token({"sub": db_user["username"]})
-    return {"access_token": access_token, "token_type": "bearer", "role": db_user["role"]}
+    return {"access_token": access_token, "token_type": "bearer", "role": db_user["role"], "user_id": str(db_user["_id"])}

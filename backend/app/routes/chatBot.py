@@ -3,7 +3,7 @@ from jose import jwt, JWTError
 from app.database import user_collection
 from app.config import SECRET_KEY, ALGORITHM
 from fastapi.security import OAuth2PasswordBearer
-from models import getUser_summaries
+from app.models import getUser_summaries
 import requests
 
 router = APIRouter()
