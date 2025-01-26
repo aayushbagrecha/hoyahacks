@@ -21,5 +21,6 @@ def getUser_summaries(username: str):
     results = list(user_collection.find(query, projection))
     return {"summaries": results}
 
-def insert_patient_consultation(patientId: int,doctorId: int, summary: str):
-    consultations_collection.insert_one({"patientId": patientId, "doctorId": doctorId, "summary": summary})
+def insert_patient_consultation(data: dict):
+    result = consultations_collection.insert_one(data)
+    return result

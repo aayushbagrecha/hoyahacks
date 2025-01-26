@@ -1,6 +1,6 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Form
 from fastapi.responses import JSONResponse
-from models import insert_patient_consultation
+from app.models import insert_patient_consultation
 import os
 import whisper
 import requests
@@ -10,7 +10,6 @@ async def transcribe_audio(audio_path, output_file):
     try:
         model = whisper.load_model("small")
         result = model.transcribe(audio_path)
-
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(result["text"])
 
@@ -24,7 +23,7 @@ async def generate_summary(conversation_text):
         print("No conversation text available.")
         return None
 
-    API_URL = "http://10.150.240.71:1234/v1/chat/completions"
+    API_URL = "http://10.150.237.60:1234/v1/chat/completions"
 
     prompt = f"""
     Give information from the following conversation for:
@@ -99,11 +98,11 @@ async def upload_audio(user_id: str = Form(...), doc_id: str = Form(...), file: 
         
         transcription_file_path = "transcription.txt"
 
-        conversation_text = await transcribe_audio(file_path, transcription_file_path)
+        conversation_text = await transcribe_audio('C:/Users/knarv/Downloads/doctor_patient_consultation.wav', transcription_file_path)
         summary = await generate_summary(conversation_text)
-        result = insert_patient_consultation(user_id,doc_id,summary)
-        if result:
-            print("Success on saving consultation")
+        # print(user_id,doc_id, summary)
+        result = insert_patient_consultation({"patientId": user_id, "doctorId": doc_id, "summary": summary})
+        print(result)
 
         return JSONResponse({"message": "File uploaded successfully", "file_path": file_path, "consultation_summary": summary})
     except Exception as e:

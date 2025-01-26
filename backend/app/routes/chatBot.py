@@ -23,7 +23,7 @@ def chatbot():
     print("\nChatbot is ready! Ask anything related to the medical summary.")
     print("Type 'exit' to end the conversation.\n")
 
-    API_URL = "http://10.150.240.71:1234/v1/chat/completions"
+    API_URL = "http://10.150.237.60:1234/v1/chat/completions"
 
     async def getUserSummaries(username):
       summaries = getUser_summaries(username)
