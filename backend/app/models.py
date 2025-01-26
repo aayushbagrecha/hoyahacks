@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from app.database import user_collection
+from app.database import user_collection, consultations_collection
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -20,3 +20,6 @@ def getUser_summaries(username: str):
     projection = {"summary": 1}
     results = list(user_collection.find(query, projection))
     return {"summaries": results}
+
+def insert_patient_consultation(patientId: int,doctorId: int, summary: str):
+    consultations_collection.insert_one({"patientId": patientId, "doctorId": doctorId, "summary": summary})

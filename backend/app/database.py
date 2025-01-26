@@ -17,6 +17,6 @@ try:
 except Exception as e:
     print(e)
     
-# Access the database and the users collection
-db = client["hoyahax"]  # Replace with your database name
-user_collection = db["users"]  # Replace with your collection names
+db = client["hoyahax"]
+user_collection = db["users"]
+consultations_collection = db["consultations"]
