@@ -27,7 +27,7 @@ const HomePage = () => {
               className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded lg:ml-6"
               onClick={handleRedirect}
             >
-              Login / Sign Up
+              Login
             </button>
           </div>
         </header>
