@@ -1,6 +1,7 @@
 import React from 'react';
 import LoginSignUp from './pages/LoginSignUp';
 import PatientDashboard from './pages/Dashboard/patient/PatientDashboard';
+import DoctorDashboard from './pages/Dashboard/doctor/DoctorDashboard'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginSignUp />} />
         <Route path="/patient-dashboard" element={<PatientDashboard />} />
+        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
       </Routes>
     </Router>
   );

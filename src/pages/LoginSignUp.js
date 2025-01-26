@@ -43,7 +43,7 @@ const LoginSignUp = () => {
         if (data.role === "patient") {
           navigate("/patient-dashboard");
         } else {
-          alert("You are not authorized to access the patient dashboard.");
+          navigate("/doctor-dashboard");
         }
       } else {
         setMessage({ type: 'success', text: 'Signup successful! Please login.' });
