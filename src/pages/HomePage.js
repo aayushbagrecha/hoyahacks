@@ -3,7 +3,7 @@ import React from "react";
 const HomePage = () => {
   const handleRedirect = () => {
     // Redirect to the Login/Sign Up page
-    window.location.href = "/";
+    window.location.href = "/login";
   };
 
   return (

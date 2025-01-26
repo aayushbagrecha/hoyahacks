@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UploadAudio from "../../../components/uploadAudio";
 import AppointmentHistory from "../../../components/AppointmentHistory";
+import Chatbot1 from "../../../../src/components/chatbot";
 
 const PatientDashboard = () => {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
@@ -174,6 +175,9 @@ const PatientDashboard = () => {
       {isUploadDialogOpen && (
         <UploadAudio handleClose={handleUploadDialogClose} isOpen={isUploadDialogOpen} />
       )}
+
+      {/* Chatbot */}
+      <Chatbot1 />
     </div>
   );
 };
