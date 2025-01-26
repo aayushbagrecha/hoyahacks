@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 
 const AppointmentHistory = ({ handleClose, isOpen }) => {
-    const [open, setOpen] = useState(isOpen);
     const [appointments, setAppointments] = useState([]);
     const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -61,7 +60,7 @@ const AppointmentHistory = ({ handleClose, isOpen }) => {
     };
 
     return (
-        <Dialog open={open} onClose={setOpen} className="relative z-10">
+        <Dialog open={isOpen} onClose={handleClose} className="relative z-10">
             <DialogBackdrop
                 transition
                 className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -173,7 +172,7 @@ const AppointmentHistory = ({ handleClose, isOpen }) => {
                         <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                             <button
                                 type="button"
-                                onClick={() => setOpen(false)}
+                                onClick={handleClose}
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                 disabled={loading} // Disable while loading
                             >

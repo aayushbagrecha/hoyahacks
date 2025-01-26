@@ -15,6 +15,15 @@ const PatientDashboard = () => {
     setIsUploadDialogOpen(false);
   };
 
+  const handleHistoryDialogOpen = () => {
+    setIsHistoryOpen(true);
+  };
+
+  const handleHistoryDialogClose = () => {
+    setIsHistoryOpen(false);
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
@@ -156,7 +165,7 @@ const PatientDashboard = () => {
             </p>
             <button
               className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 shadow-md w-full"
-              onClick={() => setIsHistoryOpen(true)}
+              onClick={handleHistoryDialogOpen}
             >
               View History
             </button>
@@ -167,7 +176,7 @@ const PatientDashboard = () => {
       {isHistoryOpen && (
         <AppointmentHistory
           isOpen={isHistoryOpen}
-          handleClose={() => setIsHistoryOpen(false)}
+          handleClose={handleHistoryDialogClose}
         />
       )}
 
