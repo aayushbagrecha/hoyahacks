@@ -9,7 +9,7 @@ router = APIRouter()
 async def transcribe_audio(audio_path, output_file):
     try:
         model = whisper.load_model("small")
-        result = model.transcribe(audio_path)
+        result = model.transcribe(audio_path, task = "translate")
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(result["text"])
 
@@ -27,11 +27,15 @@ async def generate_summary(conversation_text):
 
     prompt = f"""
     Give information from the following conversation for:
-
+    
     1. *Symptoms:* List all reported symptoms.
     2. *Prescriptions:* List the prescribed medications with medicine name and times to take.
     3. *Lab Tests:* Name the suggested tests.
     4. *General Health Advice:* Provide advice given by the doctor.
+    5. *Drug Interaction Warnings:* 
+        - Identify potential interactions between prescribed medications.
+        - Highlight any contraindications or special precautions.
+        - Provide alerts about possible side effects and safety guidelines.
 
     Conversation start:
 
@@ -97,8 +101,8 @@ async def upload_audio(user_id: str = Form(...), doc_id: str = Form(...), file: 
             f.write(await file.read())
         
         transcription_file_path = "transcription.txt"
-
-        conversation_text = await transcribe_audio('C:/Users/knarv/Downloads/doctor_patient_consultation.wav', transcription_file_path)
+        
+        conversation_text = await transcribe_audio('data/'+file.filename, transcription_file_path)
         summary = await generate_summary(conversation_text)
         # print(user_id,doc_id, summary)
         result = insert_patient_consultation({"patientId": user_id, "doctorId": doc_id, "summary": summary})
