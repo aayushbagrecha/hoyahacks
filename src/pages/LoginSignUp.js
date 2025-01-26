@@ -18,7 +18,7 @@ const LoginSignUp = () => {
     const endpoint = isLogin ? '/auth/login' : '/auth/signup';
     const payload = isLogin
       ? { username: email, password }
-      : { username: email, email, role, password };
+      : { name, email, role, password };
 
     try {
       const response = await fetch(`${baseUrl + endpoint}`, {

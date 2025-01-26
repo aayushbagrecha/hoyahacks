@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 
 const DoctorDashboard = () => {
   const [patients, setPatients] = useState([]);
-  const [consultations, setConsultations] = useState([]);
+  const [currentDoctorConsultations, setCurrentDoctorConsultations] = useState([]);
+  const [otherDoctorConsultations, setOtherDoctorConsultations] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [expandedConsultationId, setExpandedConsultationId] = useState(null);
   const [loadingPatients, setLoadingPatients] = useState(true);
   const [loadingConsultations, setLoadingConsultations] = useState(false);
 
   const baseUrl = process.env.REACT_APP_API_URL;
-  const currentDoctorId = localStorage.getItem("user_id"); // Get logged-in doctor's ID
+  const currentDoctorId = localStorage.getItem("user_id");
 
-  // Fetch all patients
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -32,7 +32,6 @@ const DoctorDashboard = () => {
     fetchPatients();
   }, [baseUrl]);
 
-  // Fetch consultations for the selected patient
   const fetchConsultations = async (patientId) => {
     setLoadingConsultations(true);
     try {
@@ -42,7 +41,6 @@ const DoctorDashboard = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Fetch doctor names for consultations
         const updatedConsultations = await Promise.all(
           data.map(async (consultation) => {
             const doctorResponse = await fetch(
@@ -59,7 +57,15 @@ const DoctorDashboard = () => {
           })
         );
 
-        setConsultations(updatedConsultations);
+        const currentDoctorConsults = updatedConsultations.filter(
+          (consultation) => consultation.doctorId === currentDoctorId
+        );
+        const otherDoctorConsults = updatedConsultations.filter(
+          (consultation) => consultation.doctorId !== currentDoctorId
+        );
+
+        setCurrentDoctorConsultations(currentDoctorConsults);
+        setOtherDoctorConsultations(otherDoctorConsults);
       } else {
         console.error("Failed to fetch consultations");
       }
@@ -82,6 +88,16 @@ const DoctorDashboard = () => {
   };
 
   const parseSummary = (summary) => {
+    // If summary is null or undefined, return empty sections
+    if (!summary) {
+      return {
+        Symptoms: [],
+        Prescriptions: [],
+        LabTests: [],
+        HealthAdvice: [],
+      };
+    }
+  
     const lines = summary.split("\n").filter((line) => line.trim() !== "");
     const sections = {
       Symptoms: [],
@@ -89,9 +105,9 @@ const DoctorDashboard = () => {
       LabTests: [],
       HealthAdvice: [],
     };
-
+  
     let currentSection = "";
-
+  
     lines.forEach((line) => {
       if (line.includes("Symptoms")) currentSection = "Symptoms";
       else if (line.includes("Prescriptions")) currentSection = "Prescriptions";
@@ -100,13 +116,116 @@ const DoctorDashboard = () => {
         currentSection = "HealthAdvice";
       else if (currentSection) sections[currentSection].push(line.trim());
     });
-
+  
     return sections;
   };
 
+  const renderConsultationSection = (consultations, title, colorClass) => (
+    <div className="mt-8">
+      <h3 className={`text-2xl font-bold mb-4 ${colorClass}`}>
+        {title}
+      </h3>
+      {consultations.length === 0 ? (
+        <p className="text-gray-600 italic">No consultations available.</p>
+      ) : (
+        consultations.map((consultation) => (
+          <div
+            key={consultation._id}
+            className="border rounded-lg shadow-md mb-4 p-4 bg-white"
+          >
+            <div className="flex justify-between items-center">
+              <h4 className="text-lg font-bold">
+                Doctor: {consultation.doctorName}
+              </h4>
+              <button
+                className="text-blue-500 hover:underline"
+                onClick={() =>
+                  toggleConsultationDetails(consultation._id)
+                }
+              >
+                {expandedConsultationId === consultation._id
+                  ? "Hide Details"
+                  : "View Details"}
+              </button>
+            </div>
+            {expandedConsultationId === consultation._id && (
+              <div className="mt-4 bg-gray-100 p-4 rounded-lg">
+                {(() => {
+                  const sections = parseSummary(consultation.summary);
+                  return (
+                    <>
+                      <div className="mb-4">
+                        <h4 className="text-lg font-bold text-red-500">
+                          Symptoms:
+                        </h4>
+                        <ul className="list-disc ml-5">
+                          {sections.Symptoms.map((symptom, index) => (
+                            <li key={index}>{symptom}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="mb-4">
+                        <h4 className="text-lg font-bold text-green-500">
+                          Prescriptions:
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {sections.Prescriptions.map(
+                            (prescription, index) => {
+                              const [title, description] =
+                                prescription
+                                  .split(":")
+                                  .map((part) => part.trim()); 
+                              return (
+                                <div
+                                  key={index}
+                                  className="p-3 border rounded-lg shadow-sm bg-white"
+                                >
+                                  <p className="text-sm">
+                                    <strong>{title}:</strong>{" "}
+                                    {description}
+                                  </p>
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <h4 className="text-lg font-bold text-blue-500">
+                          Lab Tests:
+                        </h4>
+                        <ul className="list-disc ml-5">
+                          {sections.LabTests.map((test, index) => (
+                            <li key={index}>{test}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="mb-4">
+                        <h4 className="text-lg font-bold text-yellow-500">
+                          General Health Advice:
+                        </h4>
+                        <ul className="list-disc ml-5">
+                          {sections.HealthAdvice.map(
+                            (advice, index) => (
+                              <li key={index}>{advice}</li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-blue-600 text-white py-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center px-6">
           <h1 className="text-3xl font-bold">Doctor Dashboard</h1>
@@ -122,9 +241,7 @@ const DoctorDashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto mt-8 px-8 md:px-12 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Patient Info Section */}
         <section className="col-span-1 lg:col-span-2 bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">
             Welcome, Dr. John Doe
@@ -179,111 +296,23 @@ const DoctorDashboard = () => {
             </div>
           )}
 
-          {/* Consultations */}
           {selectedPatient && (
-            <div className="mt-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Consultations for {selectedPatient.username}
-              </h3>
+            <div>
               {loadingConsultations ? (
                 <p>Loading consultations...</p>
               ) : (
-                consultations.length === 0 ? (
-                  <p className="text-gray-600 italic">
-                    No consultations by doctors.
-                  </p>
-                ) : consultations.map((consultation) => (
-                  <div
-                    key={consultation._id}
-                    className="border rounded-lg shadow-md mb-4 p-4 bg-white"
-                  >
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-lg font-bold">
-                        Doctor: {consultation.doctorName}
-                      </h4>
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() =>
-                          toggleConsultationDetails(consultation._id)
-                        }
-                      >
-                        {expandedConsultationId === consultation._id
-                          ? "Hide Details"
-                          : "View Details"}
-                      </button>
-                    </div>
-                    {expandedConsultationId === consultation._id && (
-                      <div className="mt-4 bg-gray-100 p-4 rounded-lg">
-                        {(() => {
-                          const sections = parseSummary(consultation.summary);
-                          return (
-                            <>
-                              <div className="mb-4">
-                                <h4 className="text-lg font-bold text-red-500">
-                                  Symptoms:
-                                </h4>
-                                <ul className="list-disc ml-5">
-                                  {sections.Symptoms.map((symptom, index) => (
-                                    <li key={index}>{symptom}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div className="mb-4">
-                                <h4 className="text-lg font-bold text-green-500">
-                                  Prescriptions:
-                                </h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {sections.Prescriptions.map(
-                                    (prescription, index) => {
-                                      const [title, description] =
-                                        prescription
-                                          .split(":")
-                                          .map((part) => part.trim()); // Split by colon
-                                      return (
-                                        <div
-                                          key={index}
-                                          className="p-3 border rounded-lg shadow-sm bg-white"
-                                        >
-                                          <p className="text-sm">
-                                            <strong>{title}:</strong>{" "}
-                                            {description}
-                                          </p>
-                                        </div>
-                                      );
-                                    }
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="mb-4">
-                                <h4 className="text-lg font-bold text-blue-500">
-                                  Lab Tests:
-                                </h4>
-                                <ul className="list-disc ml-5">
-                                  {sections.LabTests.map((test, index) => (
-                                    <li key={index}>{test}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div className="mb-4">
-                                <h4 className="text-lg font-bold text-yellow-500">
-                                  General Health Advice:
-                                </h4>
-                                <ul className="list-disc ml-5">
-                                  {sections.HealthAdvice.map(
-                                    (advice, index) => (
-                                      <li key={index}>{advice}</li>
-                                    )
-                                  )}
-                                </ul>
-                              </div>
-                            </>
-                          );
-                        })()}
-                      </div>
-                    )}
-                  </div>
-                ))
+                <>
+                  {renderConsultationSection(
+                    currentDoctorConsultations, 
+                    `My Consultations for ${selectedPatient.username}`, 
+                    "text-green-700"
+                  )}
+                  {renderConsultationSection(
+                    otherDoctorConsultations, 
+                    `Other Doctors' Consultations for ${selectedPatient.username}`, 
+                    "text-blue-700"
+                  )}
+                </>
               )}
             </div>
           )}
