@@ -10,9 +10,9 @@ const Chatbot1 = () => {
 
   const handleSend = async () => {
     if (!userInput.trim()) return;
-
+    const storedUserId = localStorage.getItem("user_id");
     // Add the user's message to the chat
-    const userMessage = { sender: 'user', text: userInput };
+    const userMessage = { "sender": "user", "text": userInput , "user_id": storedUserId };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     const endpoint = '/chatBot';
@@ -21,7 +21,7 @@ const Chatbot1 = () => {
       const response = await fetch(`${baseUrl + endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userMessage),
+        body: JSON.stringify(userMessage), 
       });
 
       if (!response.ok) {
