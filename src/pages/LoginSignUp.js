@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 const LoginSignUp = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,8 +9,9 @@ const LoginSignUp = () => {
   const [role, setRole] = useState('doctor'); // Default role set to 'doctor'
   const [message, setMessage] = useState({ type: '', text: '' }); // Message with type ('success' or 'error')
 
-  const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Default for local testing
-
+  const baseUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -37,6 +39,12 @@ const LoginSignUp = () => {
         // Save the token locally (for further use if needed)
         localStorage.setItem('token', data.access_token);
         setMessage({ type: 'success', text: `Login successful! Welcome, ${data.role || 'user'}!` });
+
+        if (data.role === "patient") {
+          navigate("/patient-dashboard");
+        } else {
+          alert("You are not authorized to access the patient dashboard.");
+        }
       } else {
         setMessage({ type: 'success', text: 'Signup successful! Please login.' });
         setIsLogin(true);
@@ -148,9 +156,8 @@ const LoginSignUp = () => {
         </form>
         {message.text && (
           <div
-            className={`mt-4 p-2 rounded ${
-              message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-            }`}
+            className={`mt-4 p-2 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}
           >
             {message.text}
           </div>

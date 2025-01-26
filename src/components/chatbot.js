@@ -5,6 +5,8 @@ const Chatbot1 = () => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
 
+  const baseUrl = process.env.REACT_APP_API_URL;
+
   const handleSend = async () => {
     if (!userInput.trim()) return;
 
@@ -14,7 +16,7 @@ const Chatbot1 = () => {
 
     try {
       // Send the user's message to the backend
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${baseUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userInput }),

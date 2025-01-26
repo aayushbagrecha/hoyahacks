@@ -19,7 +19,7 @@ async def signup(user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
     hashed_password = hash_password(user.password)
-    user_data = {"username": user.username, "email": user.email, "role": user.role, "password": hashed_password, "role": user.role}
+    user_data = {"username": user.username, "email": user.email, "role": user.role, "password": hashed_password}
     create_user(user_data)
     return {"message": "User created successfully"}
 
@@ -29,4 +29,4 @@ async def login(user: UserLogin):
     if not db_user or not verify_password(user.password, db_user["password"]):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     access_token = create_access_token({"sub": db_user["username"]})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "role": db_user["role"]}
