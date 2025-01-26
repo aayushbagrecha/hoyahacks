@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import UploadAudio from "../../../components/uploadAudio";
 import AppointmentHistory from "../../../components/AppointmentHistory";
 import Chatbot1 from "../../../../src/components/chatbot";
+import RecordAudio from "../../../components/recordAudio";
 
 const PatientDashboard = () => {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isRecordDialogOpen, setIsRecordDialogOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const handleUploadDialogOpen = () => {
@@ -14,6 +16,14 @@ const PatientDashboard = () => {
   const handleUploadDialogClose = () => {
     setIsUploadDialogOpen(false);
   };
+
+  const handleRecordDialogOpen = () => {
+    setIsRecordDialogOpen(true); // Correct state
+  };
+  
+  const handleRecordDialogClose = () => {
+    setIsRecordDialogOpen(false); // Correct state
+  };  
 
   const handleHistoryDialogOpen = () => {
     setIsHistoryOpen(true);
@@ -133,7 +143,7 @@ const PatientDashboard = () => {
             </p>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 shadow-md w-full"
-              onClick={() => alert("Record functionality coming soon!")}
+              onClick={handleRecordDialogOpen}
             >
               Record
             </button>
@@ -183,6 +193,11 @@ const PatientDashboard = () => {
       {/* Upload Dialog */}
       {isUploadDialogOpen && (
         <UploadAudio handleClose={handleUploadDialogClose} isOpen={isUploadDialogOpen} />
+      )}
+
+      {/* Record Dialog */}
+      {isRecordDialogOpen && (
+        <RecordAudio handleClose={handleRecordDialogClose} isOpen={isRecordDialogOpen} />
       )}
 
       {/* Chatbot */}
