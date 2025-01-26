@@ -1,6 +1,5 @@
-import React from "react";
-import { useState, useEffect } from 'react'
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { FileInput, Label } from "flowbite-react";
 
 const UploadAudio = ({ handleClose, isOpen }) => {
@@ -9,6 +8,7 @@ const UploadAudio = ({ handleClose, isOpen }) => {
     const [doctors, setDoctors] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState("");
     const [userId, setUserId] = useState("");
+    const [loading, setLoading] = useState(false); // Loading state
 
     const baseUrl = process.env.REACT_APP_API_URL;
 
@@ -50,6 +50,8 @@ const UploadAudio = ({ handleClose, isOpen }) => {
             return;
         }
 
+        setLoading(true); // Set loading to true when Save is clicked
+
         // Prepare the form data
         const formData = new FormData();
         formData.append("user_id", userId); // Add user_id
@@ -64,7 +66,7 @@ const UploadAudio = ({ handleClose, isOpen }) => {
 
             console.log("user_id:", userId);
             console.log("doc_id:", selectedDoctor);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 console.log("File uploaded:", data.file_path);
@@ -75,12 +77,15 @@ const UploadAudio = ({ handleClose, isOpen }) => {
         } catch (error) {
             console.error("Error uploading file:", error);
             alert("Error uploading file.");
+        } finally {
+            setLoading(false); // Set loading to false once the response is received
         }
 
         // Close the dialog
         setOpen(false);
         handleClose();
     };
+
     return (
         <Dialog open={open} onClose={setOpen} className="relative z-10">
             <DialogBackdrop
@@ -123,15 +128,42 @@ const UploadAudio = ({ handleClose, isOpen }) => {
                                 type="button"
                                 onClick={handleSave}
                                 className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
-                                disabled={!selectedFile || !selectedDoctor || !userId} // Disable until all fields are selected
+                                disabled={!selectedFile || !selectedDoctor || !userId || loading} // Disable button when loading
                             >
-                                Save
+                                {loading ? (
+                                    <span className="flex items-center">
+                                        <svg
+                                            className="animate-spin h-5 w-5 mr-2 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                            ></path>
+                                        </svg>
+                                        Saving...
+                                    </span>
+                                ) : (
+                                    "Save"
+                                )}
                             </button>
                             <button
                                 type="button"
                                 data-autofocus
                                 onClick={() => setOpen(false)}
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                disabled={loading} // Disable Cancel button when loading
                             >
                                 Cancel
                             </button>
@@ -141,6 +173,6 @@ const UploadAudio = ({ handleClose, isOpen }) => {
             </div>
         </Dialog>
     );
-}
+};
 
 export default UploadAudio;

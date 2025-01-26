@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, profile, uploadAudio, chatBot, user
+from app.routes import auth, profile, uploadAudio, chatBot, user, consultation
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
@@ -18,6 +18,7 @@ app.include_router(profile.router, prefix="/profile", tags=["Profile"])
 app.include_router(uploadAudio.router, prefix="/upload-audio", tags=["UploadAudio"])
 app.include_router(chatBot.router, prefix="/chatBot", tags=["chatBot"])
 app.include_router(user.router, prefix="/users", tags=["users"])
+app.include_router(consultation.router, prefix="/consultations", tags=["consultations"])
 
 @app.get("/")
 async def root():

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import UploadAudio from "../../../components/uploadAudio";
+import AppointmentHistory from "../../../components/AppointmentHistory";
 
 const PatientDashboard = () => {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const handleUploadDialogOpen = () => {
     setIsUploadDialogOpen(true);
@@ -10,15 +12,6 @@ const PatientDashboard = () => {
 
   const handleUploadDialogClose = () => {
     setIsUploadDialogOpen(false);
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log("File selected:", file);
-      alert(`File uploaded: ${file.name}`);
-      handleUploadDialogClose();
-    }
   };
 
   return (
@@ -32,7 +25,7 @@ const PatientDashboard = () => {
             onClick={() => {
               // Clear any saved tokens or session data if necessary
               localStorage.removeItem("token");
-      
+
               // Redirect to the base URL
               window.location.href = "/";
             }}
@@ -162,7 +155,7 @@ const PatientDashboard = () => {
             </p>
             <button
               className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 shadow-md w-full"
-              onClick={() => alert("View Appointment History")}
+              onClick={() => setIsHistoryOpen(true)}
             >
               View History
             </button>
@@ -170,9 +163,16 @@ const PatientDashboard = () => {
         </aside>
       </main>
 
+      {isHistoryOpen && (
+        <AppointmentHistory
+          isOpen={isHistoryOpen}
+          handleClose={() => setIsHistoryOpen(false)}
+        />
+      )}
+
       {/* Upload Dialog */}
       {isUploadDialogOpen && (
-        <UploadAudio handleClose={handleUploadDialogClose} isOpen={isUploadDialogOpen}/>
+        <UploadAudio handleClose={handleUploadDialogClose} isOpen={isUploadDialogOpen} />
       )}
     </div>
   );
