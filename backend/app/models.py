@@ -16,9 +16,10 @@ def create_user(data: dict):
     user_collection.insert_one(data)
 
 def getUser_summaries(username: str):
-    query = {"username": username}
+    print(username)
+    query = {"patientId": username}
     projection = {"summary": 1}
-    results = list(user_collection.find(query, projection))
+    results = list(consultations_collection.find(query, projection))
     return {"summaries": results}
 
 def insert_patient_consultation(data: dict):

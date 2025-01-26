@@ -17,3 +17,8 @@ class Token(BaseModel):
     token_type: str
     role: str
     user_id: str
+
+class ChatBotMessage(BaseModel):
+    sender: str
+    text: str
+    user_id: str
