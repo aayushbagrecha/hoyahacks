@@ -16,6 +16,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(profile.router, prefix="/profile", tags=["Profile"])
 app.include_router(uploadAudio.router, prefix="/upload-audio", tags=["UploadAudio"])
+app.include_router(profile.router, prefix="/chatBot", tags=["chatBot"])
 
 @app.get("/")
 async def root():

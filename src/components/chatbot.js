@@ -14,25 +14,31 @@ const Chatbot1 = () => {
     const userMessage = { sender: 'user', text: userInput };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
+    const endpoint = '/chatBot';
+
     try {
-      // Send the user's message to the backend
-      const response = await fetch(`${baseUrl}/chat`, {
+      const response = await fetch(`${baseUrl+endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userInput }),
+        body: JSON.stringify(userMessage),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.detail || 'Something went wrong!');
+        return;
+      }
 
       const data = await response.json();
 
-      // Add the backend's response to the chat
       const botMessage = { sender: 'bot', text: data.reply };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
+
     } catch (error) {
       // Handle errors
       const errorMessage = { sender: 'bot', text: 'Error processing your request. Please try again.' };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     }
-
     // Clear user input
     setUserInput('');
   };

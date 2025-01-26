@@ -14,3 +14,9 @@ def get_user_by_username(username: str):
 
 def create_user(data: dict):
     user_collection.insert_one(data)
+
+def getUser_summaries(username: str):
+    query = {"username": username}
+    projection = {"summary": 1}
+    results = list(user_collection.find(query, projection))
+    return {"summaries": results}
