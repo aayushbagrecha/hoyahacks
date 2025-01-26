@@ -25,11 +25,17 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-blue-600 text-white py-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center px-6 ">
-          <h1 className="text-3xl font-bold">Patient Dashboard</h1>
+        <div className="container mx-auto flex justify-between items-center px-6">
+          <h1 className="text-3xl font-bold ml-7">Patient Dashboard</h1>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            onClick={() => alert("Logging out...")}
+            onClick={() => {
+              // Clear any saved tokens or session data if necessary
+              localStorage.removeItem("token");
+      
+              // Redirect to the base URL
+              window.location.href = "/";
+            }}
           >
             Logout
           </button>
